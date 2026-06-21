@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BETTER_AUTH_SECRET Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg: #0E1013;
+    --surface: #16191F;
+    --surface-2: #1C2027;
+    --hairline: #272C35;
+    --text: #E7E8EA;
+    --text-dim: #8B91A0;
+    --text-faint: #565C68;
+    --amber: #F2A93B;
+    --amber-dim: #8A6324;
+    --mint: #6EE7B7;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  html, body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
+
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 48px 20px;
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(242,169,59,0.06), transparent 60%);
+  }
+
+  .wrap{
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .eyebrow::before{
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+    animation: pulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%, 100%{ opacity: 1; }
+    50%{ opacity: 0.35; }
+  }
+
+  h1{
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: clamp(26px, 5vw, 34px);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  .sub{
+    margin-top: 10px;
+    color: var(--text-dim);
+    font-size: 14.5px;
+    line-height: 1.55;
+    max-width: 460px;
+  }
+
+  .controls{
+    margin-top: 28px;
+    display:flex;
+    gap: 10px;
+  }
+
+  .field{
+    flex: 1;
+  }
+
+  .field label{
+    display:block;
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+    font-family: var(--mono);
+  }
+
+  select{
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13.5px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+
+  select:hover, select:focus{
+    border-color: var(--amber-dim);
+    outline: none;
+  }
+
+  .card{
+    margin-top: 22px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-top{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--surface-2);
+  }
+
+  .card-top .label{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+  }
+
+  .bits{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .output-row{
+    padding: 18px 14px;
+    display:flex;
+    align-items:center;
+    gap: 12px;
+  }
+
+  .secret-line{
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.5;
+    word-break: break-all;
+    color: var(--text);
+    min-height: 22px;
+  }
+
+  .secret-line .key{
+    color: var(--text-faint);
+  }
+
+  .secret-line .val{
+    color: var(--amber);
+  }
+
+  .copy-btn{
+    flex-shrink: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--hairline);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover{
+    border-color: var(--amber-dim);
+    color: var(--text);
+  }
+
+  .copy-btn.copied{
+    border-color: var(--mint);
+    color: var(--mint);
+  }
+
+  .generate-btn{
+    margin-top: 16px;
+    width: 100%;
+    background: var(--amber);
+    border: none;
+    color: #1A1100;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 13.5px;
+    letter-spacing: 0.02em;
+    padding: 13px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.05s ease;
+  }
+
+  .generate-btn:hover{ filter: brightness(1.08); }
+  .generate-btn:active{ transform: scale(0.99); }
+
+  .note{
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--text-faint);
+    line-height: 1.55;
+  }
+
+  .divider{
+    margin: 32px 0 18px;
+    display:flex;
+    align-items:center;
+    gap: 12px;
+  }
+
+  .divider .line{
+    flex:1;
+    height: 1px;
+    background: var(--hairline);
+  }
+
+  .divider span{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .alt{
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .alt-row{
+    display:flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 5px 0;
+  }
+
+  .alt-row .prompt{
+    color: var(--amber-dim);
+    flex-shrink:0;
+  }
+
+  .alt-row .cmd{
+    color: var(--text-dim);
+    word-break: break-all;
+  }
+
+  footer{
+    margin-top: 28px;
+    font-size: 12px;
+    color: var(--text-faint);
+    text-align: center;
+    font-family: var(--mono);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .eyebrow::before{ animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="eyebrow">env var generator</div>
+  <h1>BETTER_AUTH_SECRET</h1>
+  <p class="sub">A high-entropy key Better Auth uses for encryption, signing, and hashing. Generated locally with the Web Crypto API — nothing here ever leaves your browser.</p>
+
+  <div class="controls">
+    <div class="field">
+      <label for="length">Length</label>
+      <select id="length">
+        <option value="32" selected>32 bytes</option>
+        <option value="48">48 bytes</option>
+        <option value="64">64 bytes</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="encoding">Encoding</label>
+      <select id="encoding">
+        <option value="base64" selected>base64</option>
+        <option value="hex">hex</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top">
+      <span class="label">.env</span>
+      <span class="bits" id="bits">256-bit</span>
+    </div>
+    <div class="output-row">
+      <div class="secret-line" id="secretLine">
+        <span class="key">BETTER_AUTH_SECRET=</span><span class="val" id="secretVal">generating…</span>
+      </div>
+      <button class="copy-btn" id="copyBtn">copy</button>
+    </div>
+  </div>
+
+  <button class="generate-btn" id="genBtn">Generate new secret</button>
+
+  <p class="note">Use a different secret per environment (dev, staging, production). Rotating it will invalidate existing sessions and encrypted data — use <code>BETTER_AUTH_SECRETS</code> (plural) if you need a non-destructive rollover.</p>
+
+  <div class="divider"><div class="line"></div><span>or from your terminal</span><div class="line"></div></div>
+
+  <div class="alt">
+    <div class="alt-row"><span class="prompt">$</span><span class="cmd">openssl rand -base64 32</span></div>
+    <div class="alt-row"><span class="prompt">$</span><span class="cmd">npx @better-auth/cli secret</span></div>
+  </div>
+
+  <footer>crypto.getRandomValues · client-side only · no network calls</footer>
+
+</div>
+
+<script>
+  const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+  function randomBytesBase64(n){
+    const arr = new Uint8Array(n);
+    crypto.getRandomValues(arr);
+    let binary = '';
+    for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i]);
+    return btoa(binary);
+  }
+
+  function randomBytesHex(n){
+    const arr = new Uint8Array(n);
+    crypto.getRandomValues(arr);
+    return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function generateSecret(){
+    const length = parseInt(document.getElementById('length').value, 10);
+    const encoding = document.getElementById('encoding').value;
+    document.getElementById('bits').textContent = (length * 8) + '-bit';
+    return encoding === 'hex' ? randomBytesHex(length) : randomBytesBase64(length);
+  }
+
+  function scrambleReveal(finalValue){
+    const el = document.getElementById('secretVal');
+    const len = finalValue.length;
+    let frame = 0;
+    const totalFrames = 14;
+
+    const interval = setInterval(() => {
+      frame++;
+      const lockedCount = Math.floor((frame / totalFrames) * len);
+      let out = '';
+      for (let i = 0; i < len; i++){
+        if (i < lockedCount){
+          out += finalValue[i];
+        } else {
+          out += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        }
+      }
+      el.textContent = out;
+
+      if (frame >= totalFrames){
+        clearInterval(interval);
+        el.textContent = finalValue;
+      }
+    }, 28);
+  }
+
+  function runGeneration(){
+    const secret = generateSecret();
+    scrambleReveal(secret);
+    document.getElementById('copyBtn').classList.remove('copied');
+    document.getElementById('copyBtn').textContent = 'copy';
+    document.getElementById('genBtn').dataset.value = secret;
+  }
+
+  document.getElementById('genBtn').addEventListener('click', runGeneration);
+  document.getElementById('length').addEventListener('change', runGeneration);
+  document.getElementById('encoding').addEventListener('change', runGeneration);
+
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    const secret = document.getElementById('genBtn').dataset.value || document.getElementById('secretVal').textContent;
+    try{
+      await navigator.clipboard.writeText(secret);
+    } catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = secret;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'copy';
+      btn.classList.remove('copied');
+    }, 1600);
+  });
+
+  runGeneration();
+</script>
+
+</body>
+</html>

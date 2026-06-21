@@ -1,6 +1,6 @@
 ## About
 
-This is a key generator. You can use it to make 32,48,64 byte key in base64 and hex
+This is a self hosted key generator. You can use it to make 32,48,64 byte key in base64 and hex
 
 ## How to install
 
